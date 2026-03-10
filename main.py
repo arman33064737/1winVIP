@@ -1,6 +1,8 @@
 import logging
 import asyncio
 import os
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ChatMember, WebAppInfo
 from telegram.ext import (
     ApplicationBuilder, 
@@ -80,7 +82,7 @@ def get_users():
 async def check_membership(user_id: int, context: ContextTypes.DEFAULT_TYPE):
     try:
         member = await context.bot.get_chat_member(chat_id=REQUIRED_CHANNEL, user_id=user_id)
-        return member.status in [ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
+        return member.status in[ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
     except BadRequest:
         logging.error("Bot is not admin in the channel or ID is wrong!")
         return False
@@ -92,8 +94,7 @@ async def send_language_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user = update.effective_user
     welcome_text = f"Hello {user.first_name}, Welcome!\nPlease select your language:"
 
-    keyboard = [
-        [InlineKeyboardButton(LANGUAGES['en']['name'], callback_data='lang_en'),
+    keyboard = [[InlineKeyboardButton(LANGUAGES['en']['name'], callback_data='lang_en'),
          InlineKeyboardButton(LANGUAGES['hi']['name'], callback_data='lang_hi')],
         [InlineKeyboardButton(LANGUAGES['pk']['name'], callback_data='lang_pk'),
          InlineKeyboardButton(LANGUAGES['bd']['name'], callback_data='lang_bd')],
@@ -275,7 +276,7 @@ async def receive_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.delete_message(chat_id=chat_id, message_id=analyzing_msg.message_id)
     except: pass
 
-    final_keyboard = [
+    final_keyboard =[
         [InlineKeyboardButton(f"🎮 {lang_data['play_btn']}", callback_data='play_hack_action')],
         [InlineKeyboardButton(f"📺 {lang_data['guide_btn']}", url=HOW_TO_USE_LINK)]
     ]
@@ -297,8 +298,7 @@ async def play_hack_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang_code = context.user_data.get('selected_lang', 'en')
     lang_data = LANGUAGES.get(lang_code, LANGUAGES['en'])
 
-    keyboard = [[InlineKeyboardButton("✈️ Aviator", callback_data='game_aviator')],[InlineKeyboardButton("💣 Mines", callback_data='game_mines')],
-        [InlineKeyboardButton("⚽ Penalty", callback_data='game_penalty')],[InlineKeyboardButton("👑 King Thimbles", callback_data='game_king_thimbles')],
+    keyboard = [[InlineKeyboardButton("✈️ Aviator", callback_data='game_aviator')],[InlineKeyboardButton("💣 Mines", callback_data='game_mines')],[InlineKeyboardButton("⚽ Penalty", callback_data='game_penalty')],[InlineKeyboardButton("👑 King Thimbles", callback_data='game_king_thimbles')],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -550,6 +550,20 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Action Cancelled. Send /start to restart.")
     return ConversationHandler.END
 
+
+# ================= DUMMY WEB SERVER FOR RENDER =================
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b"Bot is running successfully!")
+        
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(('0.0.0.0', port), DummyHandler)
+    server.serve_forever()
+
 # ================= MAIN =================
 if __name__ == '__main__':
     logging.basicConfig(
@@ -559,6 +573,9 @@ if __name__ == '__main__':
     
     if not os.path.exists(USER_FILE):
         open(USER_FILE, 'w').close()
+
+    # ব্যাকগ্রাউন্ডে Render এর জন্য ডামি ওয়েব সার্ভার চালু করা হচ্ছে 
+    threading.Thread(target=run_dummy_server, daemon=True).start()
 
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -580,7 +597,7 @@ if __name__ == '__main__':
             BROADCAST_SIMPLE:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, perform_simple_broadcast)],
             BTN_BROADCAST_CONTENT:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, get_btn_content)],
             BTN_BROADCAST_LABEL:[MessageHandler(filters.TEXT & ~filters.COMMAND, get_btn_label)],
-            BTN_BROADCAST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, perform_btn_broadcast)],
+            BTN_BROADCAST_LINK:[MessageHandler(filters.TEXT & ~filters.COMMAND, perform_btn_broadcast)],
             BROADCAST_AUTO_SIGNAL:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, perform_auto_signal_broadcast)],
         },
         fallbacks=[CommandHandler('cancel', cancel), CommandHandler('admin', admin_panel)]
