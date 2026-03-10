@@ -72,9 +72,9 @@ def save_user(user_id):
 
 def get_users():
     if not os.path.exists(USER_FILE):
-        return []
+        return[]
     with open(USER_FILE, "r") as f:
-        return [line.strip() for line in f.readlines()]
+        return[line.strip() for line in f.readlines()]
 
 # ================= UTILITY FUNCTIONS =================
 async def check_membership(user_id: int, context: ContextTypes.DEFAULT_TYPE):
@@ -98,8 +98,7 @@ async def send_language_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         [InlineKeyboardButton(LANGUAGES['pk']['name'], callback_data='lang_pk'),
          InlineKeyboardButton(LANGUAGES['bd']['name'], callback_data='lang_bd')],
         [InlineKeyboardButton(LANGUAGES['id']['name'], callback_data='lang_id'),
-         InlineKeyboardButton(LANGUAGES['ru']['name'], callback_data='lang_ru')],
-        [InlineKeyboardButton(LANGUAGES['tr']['name'], callback_data='lang_tr'),
+         InlineKeyboardButton(LANGUAGES['ru']['name'], callback_data='lang_ru')],[InlineKeyboardButton(LANGUAGES['tr']['name'], callback_data='lang_tr'),
          InlineKeyboardButton(LANGUAGES['br']['name'], callback_data='lang_br')],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -133,9 +132,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "To use this bot, you must join our official Private channel first.\n"
             "Please join the channel and click 'Joined' button below."
         )
-        keyboard = [
-            [InlineKeyboardButton("📢 Join Private Channel", url=CHANNEL_LINK)],
-            [InlineKeyboardButton("✅ Joined / Verify", callback_data='check_join_status')]
+        keyboard = [[InlineKeyboardButton("📢 Join Private Channel", url=CHANNEL_LINK)],[InlineKeyboardButton("✅ Joined / Verify", callback_data='check_join_status')]
         ]
         await context.bot.send_message(
             chat_id=user_id, 
@@ -207,10 +204,7 @@ async def show_registration_info(update: Update, context: ContextTypes.DEFAULT_T
         "After successful registration, click the <b>Verify</b> button below."
     )
 
-    keyboard = [
-        [InlineKeyboardButton(f"🔗 {lang_data['reg_btn']}", url="https://1wezue.com/casino")],
-        [InlineKeyboardButton(f"{lang_data['verify_btn']}", callback_data='verify_reg')],
-        [InlineKeyboardButton(f"🆘 {lang_data['help_btn']}", url="https://t.me/SUNNY_BRO1")]
+    keyboard = [[InlineKeyboardButton(f"🔗 {lang_data['reg_btn']}", url="https://1wezue.com/casino")],[InlineKeyboardButton(f"{lang_data['verify_btn']}", callback_data='verify_reg')],[InlineKeyboardButton(f"🆘 {lang_data['help_btn']}", url="https://t.me/SUNNY_BRO1")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -303,11 +297,8 @@ async def play_hack_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang_code = context.user_data.get('selected_lang', 'en')
     lang_data = LANGUAGES.get(lang_code, LANGUAGES['en'])
 
-    keyboard = [
-        [InlineKeyboardButton("✈️ Aviator", callback_data='game_aviator')],
-        [InlineKeyboardButton("💣 Mines", callback_data='game_mines')],
-        [InlineKeyboardButton("⚽ Penalty", callback_data='game_penalty')],
-        [InlineKeyboardButton("👑 King Thimbles", callback_data='game_king_thimbles')],
+    keyboard = [[InlineKeyboardButton("✈️ Aviator", callback_data='game_aviator')],[InlineKeyboardButton("💣 Mines", callback_data='game_mines')],
+        [InlineKeyboardButton("⚽ Penalty", callback_data='game_penalty')],[InlineKeyboardButton("👑 King Thimbles", callback_data='game_king_thimbles')],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -347,9 +338,7 @@ async def game_selection_handler(update: Update, context: ContextTypes.DEFAULT_T
         game_name = "King Thimbles"
         hack_url = LINK_KING_THIMBLES
 
-    keyboard = [
-        [InlineKeyboardButton(f"📱 Open {game_name} Hack", web_app=WebAppInfo(url=hack_url))],
-        [InlineKeyboardButton("🔙 Back", callback_data='play_hack_action')]
+    keyboard = [[InlineKeyboardButton(f"📱 Open {game_name} Hack", web_app=WebAppInfo(url=hack_url))],[InlineKeyboardButton("🔙 Back", callback_data='play_hack_action')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -374,7 +363,7 @@ async def game_selection_handler(update: Update, context: ContextTypes.DEFAULT_T
 # ================= ADMIN HANDLERS =================
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
-        return ConversationHandler.END # Breaks any stuck states
+        return ConversationHandler.END
 
     users = get_users()
     msg = (
@@ -383,10 +372,7 @@ async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Choose an option below:"
     )
     
-    keyboard = [
-        [InlineKeyboardButton("📝 Plain Broadcast", callback_data='admin_simple_broadcast')],
-        [InlineKeyboardButton("🔗 Custom Button Broadcast", callback_data='admin_btn_broadcast')],
-        [InlineKeyboardButton("✨ Signal Broadcast (Auto Button)", callback_data='admin_auto_signal_broadcast')],
+    keyboard = [[InlineKeyboardButton("📝 Plain Broadcast", callback_data='admin_simple_broadcast')],[InlineKeyboardButton("🔗 Custom Button Broadcast", callback_data='admin_btn_broadcast')],[InlineKeyboardButton("✨ Signal Broadcast (Auto Button)", callback_data='admin_auto_signal_broadcast')],
         [InlineKeyboardButton("❌ Close", callback_data='admin_close')]
     ]
     await update.message.reply_text(
@@ -399,7 +385,7 @@ async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start_simple_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
     await update.callback_query.message.edit_text(
-        "📝 <b>Plain Broadcast Mode</b>\n\nSend message (Text or Photo).\nType /cancel to cancel.", 
+        "📝 <b>Plain Broadcast Mode</b>\n\nSend message (Text, Photo, or Video).\nType /cancel to cancel.", 
         parse_mode='HTML'
     )
     return BROADCAST_SIMPLE
@@ -415,6 +401,12 @@ async def perform_simple_broadcast(update: Update, context: ContextTypes.DEFAULT
                 await context.bot.send_photo(
                     chat_id=int(uid), 
                     photo=update.message.photo[-1].file_id, 
+                    caption=update.message.caption
+                )
+            elif update.message.video:
+                await context.bot.send_video(
+                    chat_id=int(uid), 
+                    video=update.message.video.file_id, 
                     caption=update.message.caption
                 )
             else:
@@ -433,7 +425,7 @@ async def perform_simple_broadcast(update: Update, context: ContextTypes.DEFAULT
 async def start_btn_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
     await update.callback_query.message.edit_text(
-        "🔗 <b>Custom Button Broadcast</b>\n\nStep 1: Send Message Content.\nType /cancel to cancel.", 
+        "🔗 <b>Custom Button Broadcast</b>\n\nStep 1: Send Message Content (Text, Photo, or Video).\nType /cancel to cancel.", 
         parse_mode='HTML'
     )
     return BTN_BROADCAST_CONTENT
@@ -442,6 +434,10 @@ async def get_btn_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.photo:
         context.user_data['bc_type'] = 'photo'
         context.user_data['bc_photo'] = update.message.photo[-1].file_id
+        context.user_data['bc_caption'] = update.message.caption
+    elif update.message.video:
+        context.user_data['bc_type'] = 'video'
+        context.user_data['bc_video'] = update.message.video.file_id
         context.user_data['bc_caption'] = update.message.caption
     else:
         context.user_data['bc_type'] = 'text'
@@ -457,7 +453,6 @@ async def get_btn_label(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def perform_btn_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     link = update.message.text.strip()
     
-    # Validating URL Scheme to avoid BadRequest
     if not link.startswith(('http://', 'https://')):
         link = 'https://' + link
 
@@ -477,6 +472,13 @@ async def perform_btn_broadcast(update: Update, context: ContextTypes.DEFAULT_TY
                     caption=context.user_data['bc_caption'], 
                     reply_markup=reply_markup
                 )
+            elif context.user_data['bc_type'] == 'video':
+                await context.bot.send_video(
+                    chat_id=int(uid), 
+                    video=context.user_data['bc_video'], 
+                    caption=context.user_data['bc_caption'], 
+                    reply_markup=reply_markup
+                )
             else:
                 await context.bot.send_message(
                     chat_id=int(uid), 
@@ -493,7 +495,7 @@ async def perform_btn_broadcast(update: Update, context: ContextTypes.DEFAULT_TY
 async def start_auto_signal_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
     await update.callback_query.message.edit_text(
-        "✨ <b>Signal Broadcast Mode</b>\n\nSend message (Text or Photo).\n'GET SIGNAL✨' button will be added automatically.\nType /cancel to cancel.", 
+        "✨ <b>Signal Broadcast Mode</b>\n\nSend message (Text, Photo, or Video).\n'GET SIGNAL✨' button will be added automatically.\nType /cancel to cancel.", 
         parse_mode='HTML'
     )
     return BROADCAST_AUTO_SIGNAL
@@ -512,6 +514,13 @@ async def perform_auto_signal_broadcast(update: Update, context: ContextTypes.DE
                 await context.bot.send_photo(
                     chat_id=int(uid), 
                     photo=update.message.photo[-1].file_id, 
+                    caption=update.message.caption, 
+                    reply_markup=auto_markup
+                )
+            elif update.message.video:
+                await context.bot.send_video(
+                    chat_id=int(uid), 
+                    video=update.message.video.file_id, 
                     caption=update.message.caption, 
                     reply_markup=auto_markup
                 )
@@ -556,9 +565,8 @@ if __name__ == '__main__':
     verify_conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(verify_process_start, pattern='^verify_reg$')],
         states={
-            WAITING_FOR_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_id)],
+            WAITING_FOR_ID:[MessageHandler(filters.TEXT & ~filters.COMMAND, receive_id)],
         },
-        # Added /admin as fallback to ensure admins don't get stuck in ID verification logic
         fallbacks=[CommandHandler('cancel', cancel), CommandHandler('admin', admin_panel)]
     )
 
@@ -569,17 +577,15 @@ if __name__ == '__main__':
             CallbackQueryHandler(start_auto_signal_broadcast, pattern='^admin_auto_signal_broadcast$')
         ],
         states={
-            # Excluded ~filters.COMMAND here so typing /cancel actually aborts the broadcast
-            BROADCAST_SIMPLE: [MessageHandler((filters.TEXT | filters.PHOTO) & ~filters.COMMAND, perform_simple_broadcast)],
-            BTN_BROADCAST_CONTENT: [MessageHandler((filters.TEXT | filters.PHOTO) & ~filters.COMMAND, get_btn_content)],
-            BTN_BROADCAST_LABEL: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_btn_label)],
+            BROADCAST_SIMPLE:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, perform_simple_broadcast)],
+            BTN_BROADCAST_CONTENT:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, get_btn_content)],
+            BTN_BROADCAST_LABEL:[MessageHandler(filters.TEXT & ~filters.COMMAND, get_btn_label)],
             BTN_BROADCAST_LINK: [MessageHandler(filters.TEXT & ~filters.COMMAND, perform_btn_broadcast)],
-            BROADCAST_AUTO_SIGNAL: [MessageHandler((filters.TEXT | filters.PHOTO) & ~filters.COMMAND, perform_auto_signal_broadcast)],
+            BROADCAST_AUTO_SIGNAL:[MessageHandler((filters.TEXT | filters.PHOTO | filters.VIDEO) & ~filters.COMMAND, perform_auto_signal_broadcast)],
         },
         fallbacks=[CommandHandler('cancel', cancel), CommandHandler('admin', admin_panel)]
     )
 
-    # Adding Conversations FIRST to prevent normal handlers from overlapping
     application.add_handler(verify_conv)
     application.add_handler(admin_conv)
 
