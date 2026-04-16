@@ -1,7 +1,6 @@
 import logging
 import asyncio
 import os
-import json
 import sys
 from threading import Thread
 from flask import Flask
@@ -23,6 +22,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 logger = logging.getLogger(__name__)
 
 # ================= কনফিগারেশন =================
+# আপনার দেওয়া টোকেন ও আইডি
 BOT_TOKEN = "8525057709:AAEXv7b8l8tA9qb1KuCDtlv74d9LtaVWe1Q"
 ADMIN_ID = 1146186608
 REQUIRED_CHANNEL = -1001481593780
@@ -34,30 +34,18 @@ IMAGE_URL_REG = "https://i.ibb.co/PZ5VTZVT/IMG-20260201-052425-386.jpg"
 IMAGE_URL_SUCCESS = "https://i.ibb.co/fdwt2s8D/file-00000000973471faba7ce65cd5c96718.png"
 IMAGE_HACK_MENU = "https://i.ibb.co/C3YqyxJn/Data-Breach-at-Betting-Platform-1win-Exposed-96-Million-Users.png"
 
-# ================= ফায়ারবেস সেটআপ (PEM এরর ফিক্সড) =================
-firebase_raw_config = {
-  "type": "service_account",
-  "project_id": "winbot-eea9a",
-  "private_key_id": "0fc394504ed2eb8954ec426bbe11f46eec38ffb0",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDGPOJtItY6HTIS\nqr+K+wiVmjaa1hl+qpRlHH6AjdUHVEIoVteooVHleZW/XlJZRyNMnp0fnqcChb/9\n5uXbLreay1UEnmwFUmxoqGADbxh9FSrCoyczrIGXr3EfoENxH9wVU8dtwlK6g1fY\nl0e8btmweoTsDt8qCA1BfaOBKccWCFkkg2wu8zVqghTOCw09/upzgTPALvuwDcDC\nWNpYzj87y2j+f2CMdu4RRiDZ+VosIIhSAAV1Y193UELcZDTv5/Wlj6mbKWb+O0xK\n8Yp5Z3LS/Yg4T+IsDHCxmk+3Ul3qPNb8Avuy0HuWBEgwj4rqxBoMMTjUIopp1h69\nxzbFkKu7AgMBAAECggEAAXVeNxkBWXvF1rRR5McJs6Fm/cb4eLbu5jrfmrjbFIrj\n/QxShDJCT31lrXrsq9fQTyvVkm97jBMJgWfgULdXG3jxKa+0B2qpUzB18GCHXhg4\nmyZRz1lZZLvM3xjclimlWAoolp/44C1qM9+SZApZaKkmGYnXI3sxWcYqXJ9pkGRr\nrSPZw77hY3H+2ByNO6mBGYR+yecjvTOUcBZuIqgkEmv+dRhec/QllmXZCDTYyWWM\nj6iAA1ARAQ9tep5tsv4tDUI801v24SJ0ulQLDFvaEZ16fSBu0fTnjDYeK8ukSQYB\nNfUbfGQRLeeii8XCktPtP47Vda5x9kM3ANRJdJ7FmQKBgQDwLRqqKXgjumOmY78F\ndvP/p5iYaH1nsEJ6m/JxgzyHIwhu1xS7v7KRyjLZyxTD614FK15qh3nX0A/Q2+M5\nQywNhMXnPPB01tMsFJTFKVb7TBa9XcVtQcV7XPHugceKAFUp3nQC1sw1lKKluFWb\nvuXKdkigHJ4EiNWERgoBfjyv6QKBgQDTTG7qDldWLs8UXVglwBpaMXGw/PEJxkiW\n8MHKCbhEfwU7PCB2yoB3mN+5tjPJ49g28J7FaklIwjBRxGFP3rVVtnJ2vyQzfr6n\nL1D6jAZUPLjmUWx8rCB2jWFL7eBxVlPc63tE33CMGpxq8oiBkyKsPf61pRLqNEP6\nzzCJIKA8AwKBgQCPi1WRd+F+8QpXyuvDF1ozZPZ1uJWi4ByLbSMUpswJNG342QFi\SOsv6TpFIvQROF3kFwyB/OBclNSvDoyaj8QHfGBPmQNZwX9KrC5SPCfpX4uDuESj\nzRh7Z4yM8PHST+qWcIbDn59DMseW5jn8MLbkL5euYgwrR6DdQoL+a3VX6QKBgQCC\nKe+Zl8QNf0Bp1ybZ+oFBVnwm/2qtDszgzudSQrKU33qlhuCozQ5ennoTuT4l/InR\nLmFgU51ZiOajOEqKHTOv3Xid1hnC7y0baHaGIYQ0mEN+/mHKW26UGXv6fktpBjkb\nOqTxRIPcivgYmdelmrIdUQN7enkwdYn7E29eyg5raQKBgG/kppUI/hJy0sA2TkWW\nIS/poxxHLw3VO2mNDJKhW+n1okzJ2x3Ftx3han2AlAUXmLXiOH+R0GKRpT7Xtz8J\nDP4rNxnZJ8smPuWIC4YbI9kEDrF4Pgd2USmawrycMqZdcTJ6jtSMHUdVJoTbgyd1\nicEVdXxDzM5IGdi42DcSyGBB\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@winbot-eea9a.iam.gserviceaccount.com",
-  "client_id": "111122027484565922605",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40winbot-eea9a.iam.gserviceaccount.com"
-}
-
+# ================= ফায়ারবেস কানেকশন (ফাইল পদ্ধতি) =================
+# এটি আপনার 'firebase-key.json' ফাইলটি খুঁজে বের করবে
 try:
     if not firebase_admin._apps:
-        # জেসন স্ট্রিং হিসেবে লোড করা যাতে PEM এরর না আসে
-        cred = credentials.Certificate(firebase_raw_config)
+        cred = credentials.Certificate("firebase-key.json")
         firebase_admin.initialize_app(cred, {
             'databaseURL': "https://winbot-eea9a-default-rtdb.firebaseio.com/"
         })
-    logger.info("✅ Firebase Connected Successfully!")
+    logger.info("✅ Firebase Connected Successfully from File!")
 except Exception as e:
-    logger.error(f"❌ Firebase Error: {e}")
+    logger.error(f"❌ Firebase Critical Error: {e}")
+    # ফাইল না পাওয়া গেলে বা ভুল থাকলে বট বন্ধ হয়ে যাবে যাতে আপনি লগ দেখে ঠিক করতে পারেন
     sys.exit(1)
 
 # ================= ডাটাবেস ফাংশন =================
@@ -65,7 +53,11 @@ def save_user(user):
     try:
         ref = db.reference(f'users/{user.id}')
         if not ref.get():
-            ref.set({'first_name': user.first_name, 'username': user.username or "N/A", 'id': user.id})
+            ref.set({
+                'first_name': user.first_name,
+                'username': user.username or "N/A",
+                'id': user.id
+            })
     except: pass
 
 def get_all_users():
@@ -86,10 +78,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     save_user(user)
     if await check_membership(user.id, context):
-        keyboard = [[InlineKeyboardButton("🇺🇸 English", callback_data='lang_en'), InlineKeyboardButton("🇧🇩 বাংলা", callback_data='lang_bd')]]
+        keyboard = [[InlineKeyboardButton("🇺🇸 English", callback_data='lang_en'), 
+                     InlineKeyboardButton("🇧🇩 বাংলা", callback_data='lang_bd')]]
         await update.message.reply_photo(photo=IMAGE_URL_WELCOME, caption="Select Language / ভাষা নির্বাচন করুন:", reply_markup=InlineKeyboardMarkup(keyboard))
     else:
-        keyboard = [[InlineKeyboardButton("📢 Join Channel", url=CHANNEL_LINK)], [InlineKeyboardButton("✅ Joined / Verify", callback_data='check_join')]]
+        keyboard = [[InlineKeyboardButton("📢 Join Channel", url=CHANNEL_LINK)], 
+                    [InlineKeyboardButton("✅ Joined / Verify", callback_data='check_join')]]
         await update.message.reply_text("⚠️ Join our channel first!", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def language_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -97,16 +91,20 @@ async def language_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     lang = query.data.split('_')[1]
     context.user_data['selected_lang'] = lang
-    text = "🚀 <b>Register Now!</b>\nUse promo <code>BLACK696</code> to activate hack." if lang == 'en' else "🚀 <b>রেজিস্ট্রেশন করুন!</b>\nহ্যাক অ্যাক্টিভেট করতে প্রোমো <code>BLACK696</code> ব্যবহার করুন।"
-    keyboard = [[InlineKeyboardButton("🔗 Registration Link", url="https://bit.ly/3S0V67h")], [InlineKeyboardButton("✅ I have Registered", callback_data='verify_reg')]]
+    
+    text = "🚀 <b>Register Now!</b>\nUse promo <code>BLACK696</code>." if lang == 'en' else "🚀 <b>রেজিস্ট্রেশন করুন!</b>\nপ্রোমো কোড: <code>BLACK696</code>"
+    keyboard = [[InlineKeyboardButton("🔗 Registration Link", url="https://bit.ly/3S0V67h")], 
+                [InlineKeyboardButton("✅ I have Registered", callback_data='verify_reg')]]
+    
     await query.message.delete()
     await context.bot.send_photo(chat_id=query.message.chat_id, photo=IMAGE_URL_REG, caption=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
 
+# আইডি ভেরিফাই (৫ সেকেন্ড ওয়েট)
 WAITING_FOR_ID = 0
 async def verify_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    msg = await query.message.reply_text("⏳ Verifying... 5s")
+    msg = await query.message.reply_text("⏳ Verifying sync... 5s")
     await asyncio.sleep(5)
     await msg.delete()
     await query.message.reply_text("Please send your 9-digit Account ID:")
@@ -114,18 +112,21 @@ async def verify_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def receive_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id_val = update.message.text
-    await context.bot.send_message(chat_id=ADMIN_ID, text=f"🚨 <b>New ID Submitted:</b> <code>{user_id_val}</code>", parse_mode='HTML')
-    keyboard = [[InlineKeyboardButton("🎮 Open Hack", callback_data='open_hack')]]
+    # অ্যাডমিনকে জানানো
+    await context.bot.send_message(chat_id=ADMIN_ID, text=f"🚨 <b>ID Submitted:</b> <code>{user_id_val}</code>", parse_mode='HTML')
+    
+    keyboard = [[InlineKeyboardButton("🎮 Open Hack Menu", callback_data='open_hack')]]
     await update.message.reply_photo(photo=IMAGE_URL_SUCCESS, caption="✅ <b>Verified!</b> Account linked.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode='HTML')
     return ConversationHandler.END
 
 async def hack_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    keyboard = [[InlineKeyboardButton("✈️ Aviator", web_app=WebAppInfo(url="https://aviatorbahohacker.fwh.is/"))], [InlineKeyboardButton("💣 Mines", web_app=WebAppInfo(url="https://mines-game-hack.netlify.app/"))]]
+    keyboard = [[InlineKeyboardButton("✈️ Aviator", web_app=WebAppInfo(url="https://aviatorbahohacker.fwh.is/"))], 
+                [InlineKeyboardButton("💣 Mines", web_app=WebAppInfo(url="https://mines-game-hack.netlify.app/"))]]
     await context.bot.send_photo(chat_id=query.message.chat_id, photo=IMAGE_HACK_MENU, caption="Select Game:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-# ================= অ্যাডমিন ব্রডকাস্ট =================
+# ================= অ্যাডমিন প্যানেল (ব্রডকাস্ট) =================
 BC_CONTENT, BC_LABEL, BC_LINK = range(1, 4)
 
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -136,7 +137,7 @@ async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def bc_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
-    await update.callback_query.message.reply_text("Send Message (Text/Photo):")
+    await update.callback_query.message.reply_text("Send message to broadcast (Text/Photo):")
     return BC_CONTENT
 
 async def bc_get_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -147,7 +148,7 @@ async def bc_get_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         context.user_data['bc_type'] = 'text'
         context.user_data['bc_text'] = update.message.text
-    await update.message.reply_text("Enter Button Text:")
+    await update.message.reply_text("Enter Button Label:")
     return BC_LABEL
 
 async def bc_get_label(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -174,7 +175,7 @@ async def bc_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"✅ Sent to {count} users.")
     return ConversationHandler.END
 
-# ================= অটো মেসেজ (৩ ঘণ্টা পর পর) =================
+# ================= অটো ব্রডকাস্ট (৩ ঘণ্টা পর পর) =================
 async def auto_broadcast_job(context: ContextTypes.DEFAULT_TYPE):
     users = get_all_users()
     text = "🚀 <b>New Hack Update!</b>\nচেক করুন আমাদের নতুন সিগন্যাল এবং প্রফিট করুন।\n\n[3-Hour Reminder]"
@@ -184,7 +185,7 @@ async def auto_broadcast_job(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(0.05)
         except: pass
 
-# ================= ওয়েব সার্ভার =================
+# ================= ওয়েব সার্ভার (Render/Railway Port Binding) =================
 server = Flask(__name__)
 @server.route('/')
 def home(): return "OK", 200
@@ -198,10 +199,10 @@ if __name__ == '__main__':
     Thread(target=run_web, daemon=True).start()
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
-    # অটো মেসেজ ৩ ঘণ্টা
+    # অটো মেসেজ ৩ ঘণ্টা (১০৮০০ সেকেন্ড)
     application.job_queue.run_repeating(auto_broadcast_job, interval=10800, first=10)
 
-    # হ্যান্ডলারস
+    # কনভারসেশন হ্যান্ডলারস
     user_conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(verify_start, pattern='^verify_reg$')],
         states={WAITING_FOR_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_id)]},
